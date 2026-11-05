@@ -1,0 +1,224 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "qwen/qwen3.8-27b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "fd46d8bd-9da7-4f6a-a231-2c375c60a2df",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "JbYWM6MwyM7SzkBa",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "7ccc34d6-0295-4b82-9cbc-41d82c19c90d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        544,
+        -16
+      ],
+      "id": "934409cf-dad0-43a2-a8ee-f2883d449d97",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "8059006b-c798-4d66-ad22-d4f8cb00d7ca",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -176
+      ],
+      "id": "d4292f79-dcca-4edc-9685-24598d7a28bb",
+      "name": "Webhook",
+      "webhookId": "8059006b-c798-4d66-ad22-d4f8cb00d7ca"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tapi.bale.ai/bot254012532:HgOcIGuWfT2WOa7gJTuZ5BSFlZlWp-J91mw/setWebhook",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "https://amir313mmd.app.n8n.cloud/webhook/8059006b-c798-4d66-ad22-d4f8cb00d7ca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        160
+      ],
+      "id": "1836ccb7-2a53-444b-9e6b-0dc007f3c84e",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "1aad49ef-4e08-4ccf-b181-59f5c21d893b",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -240,
+        -48
+      ],
+      "id": "9cc9549d-ebd0-41d8-b578-d0e60830b497",
+      "name": "Telegram Trigger",
+      "webhookId": "f2c9d74c-c483-4488-9fe3-a2d5468c59e6",
+      "credentials": {
+        "telegramApi": {
+          "id": "JQv1g2l3QLj6EHyO",
+          "name": "Telegram account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        -192
+      ],
+      "id": "8be43305-659e-4638-b13d-8cd05599dc19",
+      "name": "Send a text message",
+      "webhookId": "312b46a3-effe-42e7-98b5-7c628e89057e",
+      "credentials": {
+        "telegramApi": {
+          "id": "JQv1g2l3QLj6EHyO",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f331ecc3-65ad-4b58-8ea8-6a13a23a1457",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c882f5f4a0fa1bc3085096c999d9a5397bff4dca5643a51732dba264942913f"
+  },
+  "nodeGroups": [],
+  "id": "Va7VMmoUfD8X0X37",
+  "tags": []
+}
